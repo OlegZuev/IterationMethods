@@ -2,12 +2,13 @@
 #include <string>
 #include <fstream>
 #include "Matrix.h"
+#include <iomanip>
 using namespace std;
 
 const bool PRIN_TO_FILE = true;
 
 int main() {
-	string variant = "input1";
+	string variant = "input7b";
 
 	int n;
 
@@ -21,9 +22,9 @@ int main() {
 	fin.close();
 
 	ofstream fout("../" + variant + "_output" + ".txt");
-	ostream& out = PRIN_TO_FILE ? fout: cout;
+	ostream& out = PRIN_TO_FILE ? fout : cout;
 
-	out << "Variand " << variant;
+	out << "Variant " << variant << endl;
 	out << "b" << endl;
 	b.print(out);
 
@@ -49,6 +50,14 @@ int main() {
 	result = matr.conjugate_gradient_method(b, out);
 	result.print(out);
 	out << endl;
+
+	double condition_number = matr.get_third_norm() * matr.get_inverse_matrix().get_third_norm();
+	out << "Condition number: " << condition_number << endl;
+	out << "Theoretical estimation of the number of iterations: " << endl;
+	out << setprecision(0) << "Simple iteration method: " << round(log(1 / EPS) / 2 * condition_number) << endl;
+	out << setprecision(0) << "Gradient Steepest descent method: " << round(log(1 / EPS) / 2 * condition_number) << endl;
+	out << setprecision(0) << "SOR method: " << round(log(1 / EPS) / 4 * sqrt(condition_number)) << endl;
+	out << setprecision(0) << "Conjugate gradient method: " << round(log(2 / EPS) / 2 * sqrt(condition_number)) << endl;
 
 	fout.close();
 }

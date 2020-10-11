@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 #include "Vector.h"
+#define PRECISION 7
+#define EPS 1E-4
+#define EPS_COMPUTING_W 1E-2
 
 class Matrix {
 	int size{};
@@ -34,4 +37,7 @@ public:
 	double find_optimal_w(const Vector& b, std::ostream& ostr) const;
 	Vector sor_method(const Vector& b, std::ostream& ostr) const;
 	Vector conjugate_gradient_method(const Vector& b, std::ostream& ostr) const;
+	void find_LU(Matrix& matrix_PA, Matrix& matrix_U, Matrix& matrix_L, Vector& indexes, int& permutation_count) const;
+	void find_inverse_matrix(Matrix& matrix_inverseA, const Matrix& matrix_U, const Matrix& matrix_L, const Vector& indexes) const;
+	Matrix get_inverse_matrix() const;
 };

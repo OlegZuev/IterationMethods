@@ -1,4 +1,4 @@
-Variand input1b
+Variant input1b
 1 2 3 4 
 A
 7.4 3.6 2.3 -1.7 
@@ -160,3 +160,13 @@ Itr |    tau   |  q     | Norm        |  Estimate |     x[1]      x[2]      x[3]
 4 | 0.4400250 | 0.4814238 | 0.0000000 | 0.1946389 | -0.1069754 -0.3378922 2.4384233 1.5296141 | 1.1904816
 -0.1069754 -0.3378922 2.4384233 1.5296141 
 
+0.2138834 -0.1004153 -0.0761551 0.0271092 
+-0.1004153 0.2639530 -0.1489358 -0.0796439 
+-0.0761551 -0.1489358 0.6419601 0.2216424 
+0.0271092 -0.0796439 0.2216424 0.2492164 
+Condition number: 9.7879884
+Theoretical estimation of the number of iterations: 
+Simple iteration method: 45
+Gradient Steepest descent method: 45
+SOR method: 7
+Conjugate gradient method: 15

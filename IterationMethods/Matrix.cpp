@@ -2,9 +2,6 @@
 #include "Functions.h"
 #include <utility>
 #include <iomanip>
-#define PRECISION 7
-#define EPS 1E-4
-#define EPS_COMPUTING_W 1E-2
 
 /**
  * Constructor with allocating memory for matrix
@@ -476,4 +473,94 @@ Vector Matrix::conjugate_gradient_method(const Vector& b, std::ostream& ostr) co
 	} while (discrepancy_norm > EPS);
 
 	return x;
+}
+
+void Matrix::find_LU(Matrix& matrix_PA, Matrix& matrix_U, Matrix&  matrix_L, Vector& indexes, int& permutation_count) const {
+	matrix_PA = (*this);
+	matrix_U = (*this);
+	permutation_count = 0;
+	int rank = size;
+	for (int i = 0; i < size; ++i) {
+		double column_max = matrix_U[i][i];
+		int k = i;
+		for (int j = k + 1; j < size; ++j) {
+			if (fabs(column_max) < fabs(matrix_U[j][i])) {
+				column_max = matrix_U[j][i];
+				k = j;
+			}
+		}
+
+		if (fabs(matrix_PA[k][i]) < EPS) {
+			rank--;
+		}
+
+		if (i != k) {
+			permutation_count++;
+		}
+
+		std::swap(matrix_U[i], matrix_U[k]);
+		std::swap(indexes[i], indexes[k]);
+		std::swap(matrix_PA[i], matrix_PA[k]);
+
+		double multiplier = matrix_U[i][i];
+		for (int j = 0; j < size; ++j) {
+			matrix_U[i][j] = matrix_U[i][j] / multiplier;
+		}
+
+		for (int b = i + 1; b < size; ++b) {
+			multiplier = matrix_U[b][i];
+			for (int j = i; j < size; ++j) {
+				matrix_U[b][j] = matrix_U[b][j] - multiplier * matrix_U[i][j];
+			}
+		}
+
+		for (int j = 0; j <= i; ++j) {
+			double vector_mult_result = 0;
+			for (int k2 = 0; k2 < i; ++k2) {
+				vector_mult_result += matrix_L[i][k2] * matrix_U[k2][j];
+			}
+
+			matrix_L[i][j] = matrix_PA[i][j] - vector_mult_result;
+		}
+	}
+}
+
+void Matrix::find_inverse_matrix(Matrix& matrix_inverseA, const Matrix& matrix_U, const Matrix& matrix_L, const Vector& indexes) const {
+	Vector y(size);
+
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
+			double sum = 0;
+			for (int k = 0; k < j; ++k) {
+				sum += matrix_L[j][k] * y[k];
+			}
+
+			y[j] = ((i == indexes[j] ? 1 : 0) - sum) / matrix_L[j][j];
+		}
+
+		for (int j = size - 1; j >= 0; --j) {
+			double sum = 0;
+			for (int k = j + 1; k < size; ++k) {
+				sum += matrix_U[j][k] * matrix_inverseA[k][i];
+			}
+
+			matrix_inverseA[j][i] = y[j] - sum;
+		}
+	}
+}
+
+Matrix Matrix::get_inverse_matrix() const {
+	int permutation_count;
+	Matrix matrix_PA(size);
+	Matrix matrix_L(size);
+	Matrix matrix_U(size);
+	Matrix matrix_inverseA(size);
+	Vector indexes(size);
+	for (int i = 0; i < size; ++i) {
+		indexes[i] = i;
+	}
+
+	find_LU(matrix_PA, matrix_U, matrix_L, indexes, permutation_count);
+	find_inverse_matrix(matrix_inverseA, matrix_U, matrix_L, indexes);
+	return matrix_inverseA;
 }
