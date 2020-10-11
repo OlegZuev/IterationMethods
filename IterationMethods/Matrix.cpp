@@ -2,7 +2,7 @@
 #include "Functions.h"
 #include <utility>
 #include <iomanip>
-#define PRECISION 6
+#define PRECISION 7
 
 /**
  * Constructor with allocating memory for matrix
@@ -189,6 +189,9 @@ double Matrix::get_third_norm() const {
 	return sqrt(result);
 }
 
+/**
+ * Get diagonal matrix of eigenvalues
+ */
 Matrix Matrix::get_diagonal_matrix() const {
 	int im = 0;
 	int jm = 0;
@@ -226,6 +229,9 @@ Matrix Matrix::get_diagonal_matrix() const {
 	return new_matrix;
 }
 
+/**
+ * Find max element in matrix. This element must not diagonal
+ */
 double Matrix::max_not_diagonal(int& i, int& j) const {
 	double res = -1;
 	for (int k = 0; k < size; ++k) {
@@ -393,6 +399,9 @@ double Matrix::find_optimal_w(const Vector& b, std::ostream& ostr) const {
 	return optimal_w;
 }
 
+/**
+ * Successive over-relaxation method for solving system of linear equations
+ */
 Vector Matrix::sor_method(const Vector& b, std::ostream& ostr) const {
     int itr = 1;
     double w = find_optimal_w(b, ostr);
@@ -423,6 +432,9 @@ Vector Matrix::sor_method(const Vector& b, std::ostream& ostr) const {
 	return x;
 }
 
+/**
+ * Conjugate gradient method for solving system of linear equations
+ */
 Vector Matrix::conjugate_gradient_method(const Vector& b, std::ostream& ostr) const {
 	int itr = 1;
 	double discrepancy_norm;

@@ -4,8 +4,10 @@
 #include "Matrix.h"
 using namespace std;
 
+const bool PRIN_TO_FILE = false;
+
 int main() {
-	string variant = "input16b";
+	string variant = "input1";
 	ifstream fin("../" + variant + ".txt");
 
 	int n;
@@ -14,18 +16,33 @@ int main() {
 	matr.input(fin);
 	Vector b(n);
 	b.input(fin);
-
-	matr.print(cout);
-
-	cout << matr.get_third_norm() << std::endl;
-
 	fin.close();
 
 	ofstream fout("../" + variant + "_output" + ".txt");
-	ostream& out = cout;	
+	ostream& out = PRIN_TO_FILE ? fout: cout;
 
-	Vector result = matr.conjugate_gradient_method(b, out);
+	out << "Variand " << variant;
+	out << "b" << endl;
+	b.print(out);
+
+	out << "A" << endl;
+	matr.print(cout);
+
+	cout << "Third norm of a matrix" << matr.get_third_norm() << std::endl;
+
+	Vector result(n);
+	result = matr.simple_iteration_method(b, out);
 	result.print(std::cout);
+	out << endl;
+	result = matr.gradient_steepest_descent_method(b, out);
+	result.print(std::cout);
+	out << endl;
+	result = matr.sor_method(b, out);
+	result.print(std::cout);
+	out << endl;
+	result = matr.conjugate_gradient_method(b, out);
+	result.print(std::cout);
+	out << endl;
 
 	fout.close();
 }
