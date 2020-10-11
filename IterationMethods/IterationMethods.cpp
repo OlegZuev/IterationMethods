@@ -28,7 +28,7 @@ int main() {
 	out << "A" << endl;
 	matr.print(cout);
 
-	cout << "Third norm of a matrix" << matr.get_third_norm() << std::endl;
+	cout << "Third norm of a matrix " << matr.get_third_norm() << std::endl << std::endl;
 
 	Vector result(n);
 	result = matr.simple_iteration_method(b, out);

@@ -1,7 +1,8 @@
 #pragma once
+#include <iostream>
 
 class Vector;
-double find_third_norm_vector(double* x, int n);
+void print_header(std::ostream& ostr);
 
 double find_transition_matrix_norm(const Vector& prev_x, const Vector& x, const Vector& next_x);
 

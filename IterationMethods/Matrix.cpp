@@ -254,8 +254,8 @@ double Matrix::max_not_diagonal(int& i, int& j) const {
  * Simple iteration method for solving system of linear equations
  */
 Vector Matrix::simple_iteration_method(const Vector& b, std::ostream& ostr) const {
-	ostr << "                        | Discrepancy |  Error    |" << std::endl;
-	ostr << "Itr |    tau   |  q     | Norm        |  Estimate |     x[1]      x[2]      x[3]      x[4]" << std::endl;
+	ostr << "Simple iteration method" << std::endl;
+	print_header(ostr);
 	Vector x = b;
 	Vector prev_x(size);
 	Vector next_x(size);
@@ -292,8 +292,8 @@ Vector Matrix::simple_iteration_method(const Vector& b, std::ostream& ostr) cons
  * Gradient steepest descent method for solving system of linear equations
  */
 Vector Matrix::gradient_steepest_descent_method(const Vector& b, std::ostream& ostr) const {
-	ostr << "                        | Discrepancy |  Error    |" << std::endl;
-	ostr << "Itr |    tau   |  q     | Norm        |  Estimate |     x[1]      x[2]      x[3]      x[4]" << std::endl;
+	ostr << "Gradient steepest descent method" << std::endl;
+	print_header(ostr);
 	Vector x = b;
 	Vector prev_x(size);
 	Vector next_x(size);
@@ -411,8 +411,7 @@ Vector Matrix::sor_method(const Vector& b, std::ostream& ostr) const {
 	Vector next_x(size);
 
 	ostr << "SOR method" << std::endl;
-	ostr << "                        | Discrepancy |  Error    |" << std::endl;
-	ostr << "Itr |    tau   |  q     | Norm        |  Estimate |     x[1]      x[2]      x[3]      x[4]" << std::endl;
+	print_header(ostr);
 
 	do {
 		find_next_x(w, x, next_x, b);
@@ -446,8 +445,7 @@ Vector Matrix::conjugate_gradient_method(const Vector& b, std::ostream& ostr) co
 	double alpha = 1;
 
 	ostr << "Conjugate gradient method" << std::endl;
-	ostr << "                        | Discrepancy |  Error    |" << std::endl;
-	ostr << "Itr |    tau   |  q     | Norm        |  Estimate |     x[1]      x[2]      x[3]      x[4]" << std::endl;
+	print_header(ostr);
 
 	do {
 		Vector r = (*this) * x - b;
