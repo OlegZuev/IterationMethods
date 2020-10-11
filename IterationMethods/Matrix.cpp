@@ -3,6 +3,8 @@
 #include <utility>
 #include <iomanip>
 #define PRECISION 7
+#define EPS 1E-4
+#define EPS_COMPUTING_W 1E-2
 
 /**
  * Constructor with allocating memory for matrix
@@ -200,7 +202,7 @@ Matrix Matrix::get_diagonal_matrix() const {
 
 	Matrix tmp_matrix(size);
 
-	while (new_matrix.max_not_diagonal(im, jm) > 1E-4) {
+	while (new_matrix.max_not_diagonal(im, jm) > EPS) {
 		double alpha = atan(2 * new_matrix[im][jm] / (new_matrix[im][im] - new_matrix[jm][jm])) / 2;
 
 		Matrix matrix_T(size);
@@ -283,7 +285,7 @@ Vector Matrix::simple_iteration_method(const Vector& b, std::ostream& ostr) cons
 		ostr << std::fixed << std::setprecision(PRECISION) << itr << " | " << tau << " | " << q << " | " <<
 			discrepancy_norm << " | " << e << " | " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
 		itr++;
-	} while (discrepancy_norm > 1E-4);
+	} while (discrepancy_norm > EPS);
 
 	return x;
 }
@@ -326,7 +328,7 @@ Vector Matrix::gradient_steepest_descent_method(const Vector& b, std::ostream& o
 		ostr << std::fixed << std::setprecision(PRECISION) << itr << " | " << tau << " | " << q << " | " <<
 			discrepancy_norm << " | " << e << " | " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
 		itr++;
-	} while (discrepancy_norm > 1E-4);
+	} while (discrepancy_norm > EPS);
 
 	return x;
 }
@@ -383,7 +385,7 @@ double Matrix::find_optimal_w(const Vector& b, std::ostream& ostr) const {
 
 			x = next_x;
 			itr++;
-		} while (discrepancy_norm > 1E-2);
+		} while (discrepancy_norm > EPS_COMPUTING_W);
 
 		if (itr < min_itr) {
 			min_itr = itr;
@@ -426,7 +428,7 @@ Vector Matrix::sor_method(const Vector& b, std::ostream& ostr) const {
 		ostr << std::fixed << std::setprecision(PRECISION) << itr << " | " << w << " | " << q << " | " <<
 			discrepancy_norm << " | " << e << " | " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
 		itr++;
-	} while (discrepancy_norm > 1E-2);
+	} while (discrepancy_norm > EPS);
 
 	return x;
 }

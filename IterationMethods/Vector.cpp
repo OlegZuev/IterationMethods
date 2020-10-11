@@ -140,6 +140,9 @@ Vector Vector::operator+(const Vector& other) const {
 	return new_vector;
 }
 
+/**
+ * multiply vector by the number
+ */
 Vector Vector::operator*(const double number) const {
 	Vector new_vector(size);
 	for (int i = 0; i < size; i++) {
@@ -149,6 +152,9 @@ Vector Vector::operator*(const double number) const {
 	return new_vector;
 }
 
+/**
+ * Scalar vector multiply by the vector
+ */
 double Vector::operator*(const Vector& other) const {
 	double sum = 0;
 	for (int i = 0; i < size; i++) {
