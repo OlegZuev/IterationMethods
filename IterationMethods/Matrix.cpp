@@ -439,33 +439,36 @@ Vector Matrix::sor_method(const Vector& b, std::ostream& ostr) const {
 Vector Matrix::conjugate_gradient_method(const Vector& b, std::ostream& ostr) const {
 	int itr = 1;
 	double discrepancy_norm;
-	Vector x = b;
-	Vector prev_x(size);
-	Vector next_x(size);
-	double tau;
-	double prev_tau = 0;
+	Vector x = b; // x(k)
+	Vector prev_x(size); // x(k - 1)
+	Vector next_x(size); // x(k + 1)
+	Vector prev_r(size); // 
+	double prev_rr = 0;
+	double tau; // tau(k + 1)
+	double prev_tau = 0; // tau
 	double alpha = 1;
 
 	ostr << "Conjugate gradient method" << std::endl;
 	print_header(ostr);
 
 	do {
+		// computing Ax - b
 		Vector r = (*this) * x - b;
 		double rr = r * r;
-		Vector prev_r = (*this) * prev_x - b;
-		double prev_rr = prev_r * prev_r;
+
 		// find new tau
 		tau = (r * r) / (((*this) * r) * r);
 
+		// For first iteration alpha = 1
 		if (itr != 1) {
-			alpha = 1 / (1 - (tau / prev_tau) / alpha * (rr / prev_rr));
+			alpha = 1 / (1 - tau * rr / prev_tau / alpha / prev_rr);
 		}
 
+		// Computing new x
 		for (int i = 0; i < size; i++) {
 			next_x[i] = alpha * x[i] + (1 - alpha) * prev_x[i] - tau * alpha * r[i];
 		}
 
-		// ||b - A * x(k+1)||
 		discrepancy_norm = (b - (*this) * next_x).find_third_norm();
 		double q = find_transition_matrix_norm(prev_x, x, next_x);
 		double e = error_estimate(q, x, next_x);
@@ -473,10 +476,12 @@ Vector Matrix::conjugate_gradient_method(const Vector& b, std::ostream& ostr) co
 		prev_x = x;
 		x = next_x;
 		prev_tau = tau;
+		prev_r = r;
+		prev_rr = rr;
 		ostr << std::fixed << std::setprecision(PRECISION) << itr << " | " << tau << " | " << q << " | " <<
-			discrepancy_norm << " | " << e << " | " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+			discrepancy_norm << " | " << e << " | " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << " | " << alpha << std::endl;
 		itr++;
-	} while (discrepancy_norm > 10E-4);
+	} while (discrepancy_norm > EPS);
 
 	return x;
 }
