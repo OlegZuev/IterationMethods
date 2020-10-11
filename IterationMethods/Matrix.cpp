@@ -11,7 +11,7 @@ Matrix::Matrix(int n) {
 	size = n;
 	arr = new double* [size];
 	for (int i = 0; i < size; ++i) {
-		arr[i] = new double[size]{0};
+		arr[i] = new double[size] {0};
 	}
 }
 
@@ -197,7 +197,7 @@ Matrix Matrix::get_diagonal_matrix() const {
 
 	Matrix tmp_matrix(size);
 
-	while (new_matrix.max_not_diagonal(im, jm) > eps) {
+	while (new_matrix.max_not_diagonal(im, jm) > 1E-4) {
 		double alpha = atan(2 * new_matrix[im][jm] / (new_matrix[im][im] - new_matrix[jm][jm])) / 2;
 
 		Matrix matrix_T(size);
@@ -267,16 +267,204 @@ Vector Matrix::simple_iteration_method(const Vector& b, std::ostream& ostr) cons
 			next_x[i] = x[i] + tau * (b[i] - sum);
 		}
 
+		// ||b - A * x(k+1)||
 		discrepancy_norm = (b - (*this) * next_x).find_third_norm();
-		double q = find_transition_matrix_norm(itr, prev_x, x, next_x);
-		double e = error_estimate(q, prev_x, x);
+		double q = find_transition_matrix_norm(prev_x, x, next_x);
+		double e = error_estimate(q, x, next_x);
 
 		prev_x = x;
 		x = next_x;
 		ostr << std::fixed << std::setprecision(PRECISION) << itr << " | " << tau << " | " << q << " | " <<
 			discrepancy_norm << " | " << e << " | " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
 		itr++;
-	} while (discrepancy_norm > eps);
+	} while (discrepancy_norm > 1E-4);
+
+	return x;
+}
+
+/**
+ * Gradient steepest descent method for solving system of linear equations
+ */
+Vector Matrix::gradient_steepest_descent_method(const Vector& b, std::ostream& ostr) const {
+	ostr << "                        | Discrepancy |  Error    |" << std::endl;
+	ostr << "Itr |    tau   |  q     | Norm        |  Estimate |     x[1]      x[2]      x[3]      x[4]" << std::endl;
+	Vector x = b;
+	Vector prev_x(size);
+	Vector next_x(size);
+	int itr = 1;
+	double tau;
+	double discrepancy_norm;
+
+	do {
+		// find new tau
+		Vector r = (*this) * next_x - b;
+		tau = (r * r) / (((*this) * r) * r);
+
+		// find next x
+		for (int i = 0; i < size; ++i) {
+			double sum = 0;
+			for (int j = 0; j < size; ++j) {
+				sum += (*this)[i][j] * x[j];
+			}
+
+			next_x[i] = x[i] + tau * (b[i] - sum);
+		}
+
+		// ||b - A * x(k+1)||
+		discrepancy_norm = (b - (*this) * next_x).find_third_norm();
+		double q = find_transition_matrix_norm(prev_x, x, next_x);
+		double e = error_estimate(q, x, next_x);
+
+		prev_x = x;
+		x = next_x;
+		ostr << std::fixed << std::setprecision(PRECISION) << itr << " | " << tau << " | " << q << " | " <<
+			discrepancy_norm << " | " << e << " | " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+		itr++;
+	} while (discrepancy_norm > 1E-4);
+
+	return x;
+}
+
+/**
+ * finding next vector x for SOR
+ */
+void Matrix::find_next_x(double w, const Vector& x, Vector& next_x, const Vector& b) const {
+	for (int i = 0; i < size; i++) {
+		double sum1 = 0;
+		double sum2 = 0;
+
+		//for (int j = 0; j <= i - 1; j++) { 
+		//	sum1 += (*this)[i][j] * next_x[j];
+		//}
+
+		//for (int j = i + 1; j < size; j++) {
+		//	sum2 += (*this)[i][j] * x[j];
+		//}
+
+		for (int j = 0; j <= i - 1; j++) { 
+			sum1 += (*this)[i][j] * next_x[j];
+		}
+
+		for (int j = i + 1; j < size; j++) {
+			sum2 += (*this)[i][j] * x[j];
+		}
+
+		double x_zeydel = (1 / (*this)[i][i]) * (b[i] - sum1 - sum2);
+
+		next_x[i] = x[i] + w * (x_zeydel - x[i]);
+	}
+}
+
+/**
+ * finding optimal omega (w) for SOR method
+ */
+double Matrix::find_optimal_w(const Vector& b, std::ostream& ostr) const {
+	double w = 0.1;
+	double optimal_w = 0.1;
+	int min_itr = INT_MAX;
+	double discrepancy_norm;
+
+	ostr << "SOR method - search optimal w" << std::endl;
+	while (w < 2) {
+		Vector next_x(size);
+		Vector x = b;
+		int itr = 1;
+		do {
+			find_next_x(w, x, next_x, b);
+
+			// ||b - A * x(k+1)||
+			discrepancy_norm = (b - (*this) * next_x).find_third_norm();
+
+			x = next_x;
+			itr++;
+		} while (discrepancy_norm > 1E-2);
+
+		if (itr < min_itr) {
+			min_itr = itr;
+			optimal_w = w;
+		}
+
+		ostr << "w = " << w << " Itr = " << itr << std::endl;
+		w += 0.1;
+	}
+
+	ostr << std::endl;
+	ostr << "w = " << optimal_w << " ItrMin = " << min_itr << std::endl;
+	return optimal_w;
+}
+
+Vector Matrix::sor_method(const Vector& b, std::ostream& ostr) const {
+    int itr = 1;
+    double w = find_optimal_w(b, ostr);
+	double discrepancy_norm;
+    Vector x = b;
+	Vector prev_x(size);
+	Vector next_x(size);
+
+	ostr << "SOR method" << std::endl;
+	ostr << "                        | Discrepancy |  Error    |" << std::endl;
+	ostr << "Itr |    tau   |  q     | Norm        |  Estimate |     x[1]      x[2]      x[3]      x[4]" << std::endl;
+
+	do {
+		find_next_x(w, x, next_x, b);
+
+		// ||b - A * x(k+1)||
+		discrepancy_norm = (b - (*this) * next_x).find_third_norm();
+		double q = find_transition_matrix_norm(prev_x, x, next_x);
+		double e = error_estimate(q, x, next_x);
+
+		prev_x = x;
+		x = next_x;
+		ostr << std::fixed << std::setprecision(PRECISION) << itr << " | " << w << " | " << q << " | " <<
+			discrepancy_norm << " | " << e << " | " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+		itr++;
+	} while (discrepancy_norm > 1E-2);
+
+	return x;
+}
+
+Vector Matrix::conjugate_gradient_method(const Vector& b, std::ostream& ostr) const {
+	int itr = 1;
+	double discrepancy_norm;
+	Vector x = b;
+	Vector prev_x(size);
+	Vector next_x(size);
+	double tau;
+	double prev_tau = 0;
+	double alpha = 1;
+
+	ostr << "Conjugate gradient method" << std::endl;
+	ostr << "                        | Discrepancy |  Error    |" << std::endl;
+	ostr << "Itr |    tau   |  q     | Norm        |  Estimate |     x[1]      x[2]      x[3]      x[4]" << std::endl;
+
+	do {
+		Vector r = (*this) * x - b;
+		double rr = r * r;
+		Vector prev_r = (*this) * prev_x - b;
+		double prev_rr = prev_r * prev_r;
+		// find new tau
+		tau = (r * r) / (((*this) * r) * r);
+
+		if (itr != 1) {
+			alpha = 1 / (1 - (tau / prev_tau) / alpha * (rr / prev_rr));
+		}
+
+		for (int i = 0; i < size; i++) {
+			next_x[i] = alpha * x[i] + (1 - alpha) * prev_x[i] - tau * alpha * r[i];
+		}
+
+		// ||b - A * x(k+1)||
+		discrepancy_norm = (b - (*this) * next_x).find_third_norm();
+		double q = find_transition_matrix_norm(prev_x, x, next_x);
+		double e = error_estimate(q, x, next_x);
+
+		prev_x = x;
+		x = next_x;
+		prev_tau = tau;
+		ostr << std::fixed << std::setprecision(PRECISION) << itr << " | " << tau << " | " << q << " | " <<
+			discrepancy_norm << " | " << e << " | " << x[0] << " " << x[1] << " " << x[2] << " " << x[3] << std::endl;
+		itr++;
+	} while (discrepancy_norm > 10E-4);
 
 	return x;
 }

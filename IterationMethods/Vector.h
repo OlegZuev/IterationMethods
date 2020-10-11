@@ -6,8 +6,6 @@ class Vector {
 	double* arr{};
 
 public:
-	static constexpr double eps = 1E-4;
-
 	Vector() = delete;
 	explicit Vector(int n);
 	Vector(const Vector& other);
@@ -20,8 +18,11 @@ public:
 	double& operator[](int index) const;
 	void input(std::istream& fin) const;
 	void print(std::ostream& ostr) const;
+	double find_first_norm() const;
+	double find_second_norm() const;
 	double find_third_norm() const;
 	Vector operator-(const Vector& other) const;
 	Vector operator+(const Vector& other) const;
-	Vector operator*(const double number) const;
+	Vector operator*(double number) const;
+	double operator*(const Vector& other) const;
 };

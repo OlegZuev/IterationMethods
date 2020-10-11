@@ -2,11 +2,10 @@
 #include <string>
 #include <fstream>
 #include "Matrix.h"
-#include <vector>
 using namespace std;
 
 int main() {
-	string variant = "input1";
+	string variant = "input16b";
 	ifstream fin("../" + variant + ".txt");
 
 	int n;
@@ -25,7 +24,7 @@ int main() {
 	ofstream fout("../" + variant + "_output" + ".txt");
 	ostream& out = cout;	
 
-	Vector result = matr.simple_iteration_method(b, out);
+	Vector result = matr.conjugate_gradient_method(b, out);
 	result.print(std::cout);
 
 	fout.close();

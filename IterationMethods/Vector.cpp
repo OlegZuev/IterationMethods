@@ -80,6 +80,31 @@ void Vector::print(std::ostream& ostr) const {
 }
 
 /**
+ * Find the first norm (Cubic) of vector
+ */
+double Vector::find_first_norm() const {
+	double max = abs((*this)[0]);
+	for (int i = 1; i < size; i++) {
+		max = abs((*this)[i]) > max ? abs((*this)[i]) : max;
+	}
+
+	return max;
+
+}
+
+/**
+ * Find the second norm (Octahedral) of vector
+ */
+double Vector::find_second_norm() const {
+	double res = 0;
+	for (int i = 0; i < size; i++) {
+		res += fabs((*this)[i]);
+	}
+
+	return res;
+}
+
+/**
  * Find the third norm (Euclid) of vector
  */
 double Vector::find_third_norm() const {
@@ -118,8 +143,17 @@ Vector Vector::operator+(const Vector& other) const {
 Vector Vector::operator*(const double number) const {
 	Vector new_vector(size);
 	for (int i = 0; i < size; i++) {
-		new_vector[i] = arr[i] * number;
+		new_vector[i] = (*this)[i] * number;
 	}
 
 	return new_vector;
+}
+
+double Vector::operator*(const Vector& other) const {
+	double sum = 0;
+	for (int i = 0; i < size; i++) {
+		sum += (*this)[i] * other[i];
+	}
+
+	return sum;
 }
