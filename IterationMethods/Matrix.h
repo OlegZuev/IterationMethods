@@ -10,8 +10,6 @@ class Matrix {
 	double** arr{};
 
 public:
-	//static constexpr double eps = 1E-4;
-
 	Matrix() = delete;
 	explicit Matrix(int n);
 	Matrix(const Matrix& other);

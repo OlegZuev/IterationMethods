@@ -475,6 +475,9 @@ Vector Matrix::conjugate_gradient_method(const Vector& b, std::ostream& ostr) co
 	return x;
 }
 
+/**
+ * Find LU for matrix with permutations in indexes
+ */
 void Matrix::find_LU(Matrix& matrix_PA, Matrix& matrix_U, Matrix& matrix_L, Vector& indexes, int& permutation_count) const {
 	matrix_PA = (*this);
 	matrix_U = (*this);
@@ -525,6 +528,9 @@ void Matrix::find_LU(Matrix& matrix_PA, Matrix& matrix_U, Matrix& matrix_L, Vect
 	}
 }
 
+/**
+ * Find inverse matrix
+ */
 void Matrix::find_inverse_matrix(Matrix& matrix_inverseA, const Matrix& matrix_U, const Matrix& matrix_L, const Vector& indexes) const {
 	Vector y(size);
 
@@ -549,6 +555,9 @@ void Matrix::find_inverse_matrix(Matrix& matrix_inverseA, const Matrix& matrix_U
 	}
 }
 
+/**
+ * Get inverse matrix (via Lu decomposition)
+ */
 Matrix Matrix::get_inverse_matrix() const {
 	int permutation_count;
 	Matrix matrix_PA(size);
@@ -565,6 +574,9 @@ Matrix Matrix::get_inverse_matrix() const {
 	return matrix_inverseA;
 }
 
+/**
+ * Solving linear system (via LU)
+ */
 Vector Matrix::get_x_with_LU(const Vector& b) const {
 	int permutation_count;
 	Matrix matrix_PA(size);
@@ -580,6 +592,9 @@ Vector Matrix::get_x_with_LU(const Vector& b) const {
 	return find_x(b, matrix_U, matrix_L, indexes);
 }
 
+/**
+ * Solving linear system with L and U
+ */
 Vector Matrix::find_x(const Vector& b, const Matrix& matrix_U, const Matrix& matrix_L, const Vector& indexes) const {
 	Vector y(size);
 	Vector x = b;
