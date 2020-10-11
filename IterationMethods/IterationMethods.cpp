@@ -51,6 +51,10 @@ int main() {
 	result.print(out);
 	out << endl;
 
+	out << "X via LU decomposition: ";
+	matr.get_x_with_LU(b).print(out);
+	out << endl;
+
 	double condition_number = matr.get_third_norm() * matr.get_inverse_matrix().get_third_norm();
 	out << "Condition number: " << condition_number << endl;
 	out << "Theoretical estimation of the number of iterations: " << endl;

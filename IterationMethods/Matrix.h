@@ -40,4 +40,6 @@ public:
 	void find_LU(Matrix& matrix_PA, Matrix& matrix_U, Matrix& matrix_L, Vector& indexes, int& permutation_count) const;
 	void find_inverse_matrix(Matrix& matrix_inverseA, const Matrix& matrix_U, const Matrix& matrix_L, const Vector& indexes) const;
 	Matrix get_inverse_matrix() const;
+	Vector get_x_with_LU(const Vector& b) const;
+	Vector find_x(const Vector& b, const Matrix& matrix_U, const Matrix& matrix_L, const Vector& indexes) const;
 };

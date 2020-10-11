@@ -185,6 +185,8 @@ Itr |    tau   |  q     | Norm        |  Estimate |     x[1]      x[2]      x[3]
 4 | 1.0340342 | 0.0167166 | 0.0000000 | 0.0003242 | 0.3201614 0.9941469 0.9524005 0.3644000 | 1.0000573
 0.3201614 0.9941469 0.9524005 0.3644000 
 
+X via LU decomposition: 0.3201614 0.9941469 0.9524005 0.3644000 
+
 Condition number: 18.6991122
 Theoretical estimation of the number of iterations: 
 Simple iteration method: 86

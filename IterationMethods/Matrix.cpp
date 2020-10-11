@@ -338,7 +338,7 @@ void Matrix::find_next_x(double w, const Vector& x, Vector& next_x, const Vector
 		double sum1 = 0;
 		double sum2 = 0;
 
-		for (int j = 0; j <= i - 1; j++) { 
+		for (int j = 0; j <= i - 1; j++) {
 			sum1 += (*this)[i][j] * next_x[j];
 		}
 
@@ -394,10 +394,10 @@ double Matrix::find_optimal_w(const Vector& b, std::ostream& ostr) const {
  * Successive over-relaxation method for solving system of linear equations
  */
 Vector Matrix::sor_method(const Vector& b, std::ostream& ostr) const {
-    int itr = 1;
-    double w = find_optimal_w(b, ostr);
+	int itr = 1;
+	double w = find_optimal_w(b, ostr);
 	double discrepancy_norm;
-    Vector x = b;
+	Vector x = b;
 	Vector prev_x(size);
 	Vector next_x(size);
 
@@ -475,7 +475,7 @@ Vector Matrix::conjugate_gradient_method(const Vector& b, std::ostream& ostr) co
 	return x;
 }
 
-void Matrix::find_LU(Matrix& matrix_PA, Matrix& matrix_U, Matrix&  matrix_L, Vector& indexes, int& permutation_count) const {
+void Matrix::find_LU(Matrix& matrix_PA, Matrix& matrix_U, Matrix& matrix_L, Vector& indexes, int& permutation_count) const {
 	matrix_PA = (*this);
 	matrix_U = (*this);
 	permutation_count = 0;
@@ -563,4 +563,43 @@ Matrix Matrix::get_inverse_matrix() const {
 	find_LU(matrix_PA, matrix_U, matrix_L, indexes, permutation_count);
 	find_inverse_matrix(matrix_inverseA, matrix_U, matrix_L, indexes);
 	return matrix_inverseA;
+}
+
+Vector Matrix::get_x_with_LU(const Vector& b) const {
+	int permutation_count;
+	Matrix matrix_PA(size);
+	Matrix matrix_L(size);
+	Matrix matrix_U(size);
+	Matrix matrix_inverseA(size);
+	Vector indexes(size);
+	for (int i = 0; i < size; ++i) {
+		indexes[i] = i;
+	}
+
+	find_LU(matrix_PA, matrix_U, matrix_L, indexes, permutation_count);
+	return find_x(b, matrix_U, matrix_L, indexes);
+}
+
+Vector Matrix::find_x(const Vector& b, const Matrix& matrix_U, const Matrix& matrix_L, const Vector& indexes) const {
+	Vector y(size);
+	Vector x = b;
+	for (int j = 0; j < size; ++j) {
+		double sum = 0;
+		for (int k = 0; k < j; ++k) {
+			sum += matrix_L[j][k] * y[k];
+		}
+
+		y[j] = (b[indexes[j]] - sum) / matrix_L[j][j];
+	}
+
+	for (int j = size - 1; j >= 0; --j) {
+		double sum = 0;
+		for (int k = j + 1; k < size; ++k) {
+			sum += matrix_U[j][k] * x[k];
+		}
+
+		x[j] = y[j] - sum;
+	}
+
+	return x;
 }
