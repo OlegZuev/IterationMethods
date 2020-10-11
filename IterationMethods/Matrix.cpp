@@ -341,14 +341,6 @@ void Matrix::find_next_x(double w, const Vector& x, Vector& next_x, const Vector
 		double sum1 = 0;
 		double sum2 = 0;
 
-		//for (int j = 0; j <= i - 1; j++) { 
-		//	sum1 += (*this)[i][j] * next_x[j];
-		//}
-
-		//for (int j = i + 1; j < size; j++) {
-		//	sum2 += (*this)[i][j] * x[j];
-		//}
-
 		for (int j = 0; j <= i - 1; j++) { 
 			sum1 += (*this)[i][j] * next_x[j];
 		}
